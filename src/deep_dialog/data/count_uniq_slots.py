@@ -8,4 +8,4 @@ for i in goals:
 	for j in i['request_slots'].keys():
 		slots.append(j)
 
-print slots
+print(slots)

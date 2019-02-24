@@ -6,7 +6,7 @@ Created on May 25, 2016
 
 import copy, random
 from deep_dialog import dialog_config
-from agent import Agent
+from deep_dialog.agents.agent import Agent
 
 
 class InformAgent(Agent):
@@ -25,7 +25,8 @@ class InformAgent(Agent):
         
         self.state['turn'] += 2
         if self.current_slot_id < len(self.slot_set.keys()):
-            slot = self.slot_set.keys()[self.current_slot_id]
+            slot_keys = list(self.slot_set.keys())
+            slot = slot_keys[self.current_slot_id]
             self.current_slot_id += 1
 
             act_slot_response = {}
@@ -114,7 +115,7 @@ class EchoAgent(Agent):
         # if so, inform it
         ########################################################################
         if user_action['diaact'] == 'request':
-            requested_slot = user_action['request_slots'].keys()[0]
+            requested_slot = list(user_action['request_slots'].keys())[0]
 
             act_slot_response['diaact'] = "inform"
             act_slot_response['inform_slots'][requested_slot] = "PLACEHOLDER"
@@ -157,6 +158,6 @@ class RequestBasicsAgent(Agent):
         elif self.phase == 1:
             act_slot_response = {'diaact': "thanks", 'inform_slots': {}, 'request_slots': {}, 'turn': self.state['turn']}
         else:
-            raise Exception("THIS SHOULD NOT BE POSSIBLE (AGENT CALLED IN UNANTICIPATED WAY)")
+            raise(Exception("THIS SHOULD NOT BE POSSIBLE (AGENT CALLED IN UNANTICIPATED WAY)"))
         return {'act_slot_response': act_slot_response, 'act_slot_value_response': None}
 

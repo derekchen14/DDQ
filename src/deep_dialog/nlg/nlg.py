@@ -7,7 +7,8 @@ Created on Oct 17, 2016
 @author: xiul
 '''
 
-import cPickle as pickle
+# import cPickle as pickle
+import pickle
 import copy, argparse, json
 import numpy as np
 
@@ -55,9 +56,10 @@ class nlg:
         
         # remove I do not care slot in task(complete)
         if dia_act['diaact'] == 'inform' and 'taskcomplete' in dia_act['inform_slots'].keys() and dia_act['inform_slots']['taskcomplete'] != dialog_config.NO_VALUE_MATCH:
-            inform_slot_set = dia_act['inform_slots'].keys()
+            inform_slot_set = list(dia_act['inform_slots'].keys()).copy()
             for slot in inform_slot_set:
-                if dia_act['inform_slots'][slot] == dialog_config.I_DO_NOT_CARE: del dia_act['inform_slots'][slot]
+                if dia_act['inform_slots'][slot] == dialog_config.I_DO_NOT_CARE:
+                    del dia_act['inform_slots'][slot]
         
         if dia_act['diaact'] in self.diaact_nl_pairs['dia_acts'].keys():
             for ele in self.diaact_nl_pairs['dia_acts'][dia_act['diaact']]:
@@ -134,8 +136,7 @@ class nlg:
     
     def load_nlg_model(self, model_path):
         """ load the trained NLG model """
-        
-        model_params = pickle.load(open(model_path))
+        model_params = pickle.load(open(model_path, 'rb'), encoding='latin1')
     
         hidden_size = model_params['model']['Wd'].shape[0]
         output_size = model_params['model']['Wd'].shape[1]
@@ -160,7 +161,7 @@ class nlg:
     def diaact_to_nl_slot_filling(self, dia_act, template_sentence):
         """ Replace the slots with its values """
         
-        sentence = template_sentence
+        sentence = template_sentence.decode("utf-8")
         counter = 0
         for slot in dia_act['inform_slots'].keys():
             slot_val = dia_act['inform_slots'][slot]
@@ -171,7 +172,7 @@ class nlg:
                 counter += 1
                 sentence = sentence.replace('$'+slot+'$', '', 1)
                 continue
-            
+
             sentence = sentence.replace('$'+slot+'$', slot_val, 1)
         
         if counter > 0 and counter == len(dia_act['inform_slots']):
@@ -201,7 +202,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     params = vars(args)
 
-    print ("User Simulator Parameters:")
-    print (json.dumps(params, indent=2))
+    print("User Simulator Parameters:")
+    print(json.dumps(params, indent=2))
 
     main(params)
