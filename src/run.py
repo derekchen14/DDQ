@@ -99,7 +99,7 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', dest='batch_size', type=int, default=16, help='batch size')
     parser.add_argument('--gamma', dest='gamma', type=float, default=0.9, help='gamma for DQN')
     parser.add_argument('--predict_mode', dest='predict_mode', type=bool, default=False, help='predict model for DQN')
-    parser.add_argument('--simulation_epoch_size', dest='simulation_epoch_size', type=int, default=50,
+    parser.add_argument('--simulation_epoch_size', dest='simulation_epoch_size', type=int, default=100,
                         help='the size of validation set')
     parser.add_argument('--warm_start', dest='warm_start', type=int, default=1,
                         help='0: no warm start; 1: warm start for training')
