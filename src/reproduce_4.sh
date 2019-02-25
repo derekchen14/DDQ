@@ -1,4 +1,5 @@
-#Below is the script used for figure 4
+#!/usr/bin/env bash
+
 for ((i=1; i<= 5; i++));do
   let "seed=$i*100"
   python run.py --agt 9 --usr 1 --max_turn 40 --episodes 500 \
@@ -8,7 +9,7 @@ for ((i=1; i<= 5; i++));do
   --write_model_dir ./deep_dialog/checkpoints/DDQ_k0_run$i
 done
 
-for ((i=1; i<= 5; i++)); do
+for ((i=1; i<= 5; i++));do
   let "seed=$i*100"
   python run.py --agt 9 --usr 1 --max_turn 40 --episodes 500 \
   --movie_kb_path ./deep_dialog/data/movie_kb.1k.json --dqn_hidden_size 80 \
