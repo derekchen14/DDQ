@@ -346,7 +346,7 @@ def simulation_epoch(simulation_epoch_size, episode_count):
         dialog_manager.initialize_episode(use_environment=True)
         episode_over = False
         while (not episode_over):
-            episode_over, reward = dialog_manager.next_turn(record_training_data_for_user=False)
+            episode_over, reward = dialog_manager.next_turn(record_training_data_for_user=False, mode="sim")
             cumulative_reward += reward
             if episode_over:
                 if reward > 0:
@@ -383,7 +383,7 @@ def simulation_epoch_for_training(simulation_epoch_size, grounded_for_model=Fals
 
         episode_over = False
         while (not episode_over):
-            episode_over, reward = dialog_manager.next_turn()
+            episode_over, reward = dialog_manager.next_turn(mode="planning")
             cumulative_reward += reward
             if episode_over:
                 if reward > 0:
@@ -416,7 +416,7 @@ def warm_start_simulation():
         dialog_manager.initialize_episode(use_environment=True)
         episode_over = False
         while (not episode_over):
-            episode_over, reward = dialog_manager.next_turn()
+            episode_over, reward = dialog_manager.next_turn(mode="warm")
             cumulative_reward += reward
             if episode_over:
                 if reward > 0:
@@ -477,7 +477,7 @@ def run_episodes(count, status):
         episode_over = False
 
         while not episode_over:
-            episode_over, reward = dialog_manager.next_turn(record_training_data_for_user=False)
+            episode_over, reward = dialog_manager.next_turn(record_training_data_for_user=False, mode="rl")
             cumulative_reward += reward
 
             if episode_over:
@@ -546,3 +546,22 @@ def run_episodes(count, status):
 
 
 run_episodes(num_episodes, status)
+
+
+'''
+rule-based simulator == environment
+neural-based simulator == world model
+
+warm start = run with rule-based user simulator just to have some experiences
+for each episode
+    run exactly one episode of direct reinforcement learning with real user experiences
+user simulator training = "world model planning"
+     a Multi-layer Perceptron with multiple heads
+     for reward, next user action, and episode termination
+RL training = planning with simulated experiences
+    a single "planning step" is actually a full training episode
+
+Study heuristic for annealing the  K-planning steps
+
+same agent, but uses two different replay buffers
+'''
