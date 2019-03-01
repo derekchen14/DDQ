@@ -337,6 +337,7 @@ def save_performance_records(path, agt, records):
 
 
 def simulation_epoch(simulation_epoch_size, episode_count):
+    # uses the rulebased environment
     successes = 0
     cumulative_reward = 0
     cumulative_turns = 0
@@ -346,7 +347,7 @@ def simulation_epoch(simulation_epoch_size, episode_count):
         dialog_manager.initialize_episode(use_environment=True)
         episode_over = False
         while (not episode_over):
-            episode_over, reward = dialog_manager.next_turn(record_training_data_for_user=False, mode="sim")
+            episode_over, reward = dialog_manager.next_turn(record_training_data_for_user=False)
             cumulative_reward += reward
             if episode_over:
                 if reward > 0:
@@ -383,7 +384,8 @@ def simulation_epoch_for_training(simulation_epoch_size, grounded_for_model=Fals
 
         episode_over = False
         while (not episode_over):
-            episode_over, reward = dialog_manager.next_turn(mode="planning")
+            # sometimes rulebased, and then neural world model
+            episode_over, reward = dialog_manager.next_turn()
             cumulative_reward += reward
             if episode_over:
                 if reward > 0:
@@ -406,6 +408,7 @@ def simulation_epoch_for_training(simulation_epoch_size, grounded_for_model=Fals
 
 
 def warm_start_simulation():
+    # uses rulebased environment
     successes = 0
     cumulative_reward = 0
     cumulative_turns = 0
@@ -416,7 +419,7 @@ def warm_start_simulation():
         dialog_manager.initialize_episode(use_environment=True)
         episode_over = False
         while (not episode_over):
-            episode_over, reward = dialog_manager.next_turn(mode="warm")
+            episode_over, reward = dialog_manager.next_turn()
             cumulative_reward += reward
             if episode_over:
                 if reward > 0:
@@ -477,7 +480,8 @@ def run_episodes(count, status):
         episode_over = False
 
         while not episode_over:
-            episode_over, reward = dialog_manager.next_turn(record_training_data_for_user=False, mode="rl")
+            # uses rulebased environment
+            episode_over, reward = dialog_manager.next_turn(record_training_data_for_user=False)
             cumulative_reward += reward
 
             if episode_over:
@@ -551,17 +555,29 @@ run_episodes(num_episodes, status)
 '''
 rule-based simulator == environment
 neural-based simulator == world model
+grounded=1 --> DQN only
+    use_env in initialize episode -->
+    rulebased user simulator -->
+    easier to learn the results, so easier to get high accuracy
+
 
 warm start = run with rule-based user simulator just to have some experiences
 for each episode
     run exactly one episode of direct reinforcement learning with real user experiences
-user simulator training = "world model planning"
-     a Multi-layer Perceptron with multiple heads
-     for reward, next user action, and episode termination
-RL training = planning with simulated experiences
-    a single "planning step" is actually a full training episode
+    simulation_epoch_for_training = world model learning? training the world model
+        user simulator training = "world model planning"
+         a Multi-layer Perceptron with multiple heads
+        for reward, next user action, and episode termination
+        first time is rulebased, then all subsequent is neural based
+    simulation_epoch = planning with simulated experiences
+        a single "planning step" is actually a full training episode
 
 Study heuristic for annealing the  K-planning steps
 
 same agent, but uses two different replay buffers
+
+
+word.train occurs after the "planning"
+but in the algorithm in the paper, it occurs within the isolated world model phase
+the order is incorrect.
 '''

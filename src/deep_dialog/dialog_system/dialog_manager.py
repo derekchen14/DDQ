@@ -59,7 +59,7 @@ class DialogManager:
 
         self.agent.initialize_episode()
 
-    def next_turn(self, mode, record_training_data=True, record_training_data_for_user=True):
+    def next_turn(self, record_training_data=True, record_training_data_for_user=True):
         """ This function initiates each subsequent exchange between agent and user (agent first) """
 
         ########################################################################
@@ -83,11 +83,9 @@ class DialogManager:
         ########################################################################
         self.sys_action = self.state_tracker.dialog_history_dictionaries()[-1]
         if self.use_world_model:
-            print(mode, "uses neural world model")
             self.user_action, self.episode_over, self.reward = self.running_user.next(self.state_user,
                                                                                       self.agent.action)
         else:
-            print(mode, "uses rulebased environment")
             self.user_action, self.episode_over, dialog_status = self.running_user.next(self.sys_action)
             self.reward = self.reward_function(dialog_status)
 
